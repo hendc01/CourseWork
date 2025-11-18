@@ -1,6 +1,6 @@
 /***********************************************************************
   courseworkManager.c
-  Program Description
+  School Grades System.
   Henrique Dias Camargo
   version 10
  **********************************************************************/
@@ -76,7 +76,6 @@ int main(void)
 	int (*listCourseworks[])[1] = {coursework1, coursework2,
 		coursework3};
 	
-	int studentsNum = 0;
 	char studentsList[MAX][LENGTH];
 	
 	int menuOption;
@@ -89,9 +88,9 @@ int main(void)
 	
 	flagMaker(listCourseworks);
 	
-	studentsNum = studentsGenerator(studentsList);
+	studentsGenerator(studentsList);
 	screencleaner();
-	while( studentsNum != 0 )
+	while( menuOption != 4 )
 	{
 		menuOption = menu();
 		if( menuOption == 1 )
@@ -109,6 +108,7 @@ int main(void)
 				printf( "CourseWork %d has already been locked.\n"
 					   "Changes only possible in Supervisor Mode.\n\n",
 					   menu1 );
+				bufferCleaner();
 				enterPress();
 				screencleaner();
 				continue;
@@ -131,6 +131,7 @@ int main(void)
 					   studentsList, grades, menu2);
 			
 		}
+		/*Supervisor Mode*/
 		else if(menuOption == 3)
 		{
 			screencleaner();
@@ -142,23 +143,28 @@ int main(void)
 			
 			if(strcmp(password, passwordChecker) == 0)
 			{
+				/*Change the password*/
 				menu3 = displayMenu3();
 				if(menu3 == 1)
 				{
 					menu3ChangPass( passwordChecker, password );
 				}
+				/*Modify a specific mark*/
 				else if( menu3 == 2 )
 				{
 					menu3ModMarks( listCourseworks, studentsList );  
 				}
+				/*Add a new student*/
 				else if(menu3 == 3)
 				{
 					menu3AddSdt( studentsList );
 				}
+				/*Edit a student name*/
 				else if(menu3 == 4)
 				{
 					menu3ChgName( studentsList );
 				}
+				/*Exit*/
 				else if( menu3 == 5 )
 				{
 					screencleaner();
@@ -474,16 +480,17 @@ int menu( void )
 	printf( "1 Enter Marks\n" );
 	printf( "2 Display student's marks\n" );
 	printf( "3 Supervisor Mode\n" );
+	printf( "4 Exit\n" );
 	do
 	{
-		printf( "Input the menu options (1, 2 or 3): " );
+		printf( "Input the menu options : " );
 		while (scanf( "%d", &menuOption) != 1 )
 		{
 			printf( "ERROR: Input a number: " );
 			bufferCleaner();
 		}
 		bufferCleaner();
-		if( menuOption >= 1 && menuOption <= 3 )
+		if( menuOption >= 1 && menuOption <= 4 )
 		{
 			return menuOption;
 		}
@@ -493,7 +500,9 @@ int menu( void )
 		}
 	}while( 1 );
 }
-/*Display the first option in the main menu*/
+/*Display the first option in the main menu
+(enter marks)
+*/
 int displayMenu1( void )
 {
 	int menu1;
@@ -527,7 +536,8 @@ int displayMenu1( void )
 		}
 	}while( 1 );
 }
-/*Display the second option in the main menu*/
+/*Display the second option in the main menu
+(display marks)*/
 int displayMenu2( void )
 {
 	int menu2;
@@ -589,7 +599,7 @@ int displayMenu3( void )
 		}
 	}while( 1 );
 }
-/*Menu 1 Conditional*/
+/*Menu 1 action code(Entering marks)*/
 void menu1MarkGen( int (*listCourseworks[])[1],
 			   char studentsList[MAX][LENGTH], int grades[MAX][1],
 			   int menu1 )
@@ -606,7 +616,7 @@ void menu1MarkGen( int (*listCourseworks[])[1],
 	gradeGenerator( listCourseworks, studentsList, grades );
 }
 
-/*Display marks and grades menu action*/
+/*Display marks and grades menu action code*/
 void menu2ShowMark( int ( *listCourseworks[] )[1],
 			   char studentsList[MAX][LENGTH], int grades[MAX][1],
 			   int menu2 )
@@ -625,6 +635,7 @@ void menu2ShowMark( int ( *listCourseworks[] )[1],
 			cwDisplay( listCourseworks[menu2 -1],
 					  studentsList, 
 					  studentsNum ); 
+			bufferCleaner();
 			enterPress();
 
 		}
@@ -633,9 +644,12 @@ void menu2ShowMark( int ( *listCourseworks[] )[1],
 			printf( "The marks for coursework %d have not "
 				   "been input yet. Please try again after " 
 				   "entering the marks.\n", menu2 );
+			bufferCleaner();
 			enterPress();
 		}
 	}
+	/*Test if there is an actual mark in the courseworks list, or
+	just the flag input.*/
 	else if( menu2 == 4)
 	{	
 		if( listCourseworks[0][0][0] != -1 &&
@@ -658,9 +672,9 @@ void menu2ShowMark( int ( *listCourseworks[] )[1],
 	screencleaner();
 }
 /*
-Menu 3 conditional test
+Menu 3 action code option 1
+Change the password
 */
-/*Changes the password*/
 void menu3ChangPass( char passwordChecker[13], char password[13] )
 {
 	screencleaner();
@@ -668,7 +682,7 @@ void menu3ChangPass( char passwordChecker[13], char password[13] )
 	passwordChange( passwordChecker, password );
 	screencleaner();
 }
-/*Modifying Marks*/
+/*Modifying Marks Menu 3 option 2*/
 void menu3ModMarks(int ( *listCourseworks[] )[1],
 				char studentsList[MAX][LENGTH])
 {
@@ -695,7 +709,7 @@ void menu3ModMarks(int ( *listCourseworks[] )[1],
 		return;
 	}
 }
-/*Add student to studentList*/
+/*Add student to studentList, supervisor mode menu 3 option 3*/
 void menu3AddSdt( char studentsList[MAX][LENGTH] )
 {
 	screencleaner();
@@ -704,7 +718,7 @@ void menu3AddSdt( char studentsList[MAX][LENGTH] )
 	enterPress();
 	screencleaner();	
 }
-/*Change name*/
+/*Change name menu 3 supervisor mode option 4*/
 void menu3ChgName( char studentsList[MAX][LENGTH] )
 {
 	screencleaner();
@@ -799,5 +813,3 @@ void bufferCleaner()
 		;
 	}
 }
-
-
