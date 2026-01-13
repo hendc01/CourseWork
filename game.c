@@ -12,55 +12,66 @@ void game ( void )
 	menu1();
 	
 	initializer( &grid );
-	gameInput( &grid );
+	gamePVPControler( &grid );
 	
 }
 /*Allow the user to input the grids, and checks if that block is empty*/
-GameResult gameInput( board *grid	)
+position gameInput()
 {
+	position ps;
+	
+	printf("Type the collum:\n");
+	ps.collum = intInput(1, 3) - 1;
+	
+	printf("Type the row\n");
+	ps.row = intInput(1,3) -1 ;
+	
+	return ps;
+}
+
+GameResult gamePVPControler( board *grid	)
+{
+	GameResult winner;
+	position ps;
 	State moveResult;
-	int collum, row;
-	Cell winner = CELL_EMPTY;
+
+	
 	int turn = 0;
 	
 	while( 1 )
 	{
-		printf("Type the collum:\n");
-		collum = intInput(1, 3);
-		printf("Type the row\n");
-		row = intInput(1,3);
-		collum--;
-		row--;
+		ps = gameInput();
 		
-		moveResult = gridAlloc( grid, row, collum, turn );
+		moveResult = gridAlloc( grid, ps.row, ps.collum, turn );
 		displayMoveMsg( moveResult );
 		
 		if( moveResult == MOVE_OK )
 		{
 			printBoard( grid );
-			winner = winChecker( grid );
-			if( winner == CELL_X )
+			winner = result( grid );
+			if( winner != RESULT_NOT_WIN )
 			{
-				return RESULT_X_WINS;
+				return winner;
 			}
-			else if( winner == CELL_O )
-			{
-				return RESULT_O_WINS;
-			}
-			else if( winner == CELL_EMPTY && turn == 8 )
-			{
-				return RESULT_DRAW;
-			}
-			turn++;
-			int level = level1( grid, turn );
-			if( level)
-			{
-				printBoard( grid );
-				turn++;
-			}
+			turn++; 
 		}
-		
 	}	
+}
+
+GameResult result( const board *grid )
+{
+	Cell winner = CELL_EMPTY;
+	winner = winChecker( grid );
+	
+	switch (winner)
+	{
+	case CELL_X:
+		return RESULT_X_WINS;
+	case CELL_O:
+		return RESULT_O_WINS;
+	case CELL_EMPTY:
+		return RESULT_NOT_WIN;
+	}
 }
 /*Makes the board move*/
 State gridAlloc( board *grid, int row, int collum, int turn )
@@ -197,7 +208,6 @@ Cell verticalChecker( const board *grid )
 	}
 	return CELL_EMPTY;
 }
-
 
 Cell diagonalChecker(const board *grid)
 {
